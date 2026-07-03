@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Absolute Zero — software da provare e scaricare."
+  />
+  <title>Absolute Zero</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="script.js" defer></script>
+</head>
+<body id="top">
+  <header class="site-header">
+    <a class="header-contact" href="#contact">Contattaci</a>
+
+    <a class="brand" href="#top" aria-label="Absolute Zero">
+      Absolute Zero
+    </a>
+
+    <button
+      class="menu-toggle"
+      id="menuToggle"
+      type="button"
+      aria-label="Apri menu"
+      aria-expanded="false"
+      aria-controls="siteMenu"
+    >
+      <span></span>
+      <span></span>
+      <span class="menu-label">Menu</span>
+    </button>
+  </header>
+
+  <div class="menu-overlay" id="menuOverlay" hidden></div>
+
+  <nav class="menu-panel" id="siteMenu" aria-hidden="true">
+    <a href="#top">Home</a>
+    <a href="#software">Software</a>
+    <a href="#contact">Contatti</a>
+  </nav>
+
+  <main>
+    <section class="hero">
+      <div class="hero-inner">
+        <h1>Software da provare.</h1>
+        <p class="hero-subtitle">
+          Scarica subito Avelis, PipeRoute e MixerTime.
+        </p>
+
+        <div class="hero-actions">
+          <a class="button button-dark" href="downloads/avelis.zip" download>
+            Scarica Avelis
+          </a>
+          <a class="button" href="downloads/piperoute.zip" download>
+            Scarica PipeRoute
+          </a>
+          <a class="button" href="downloads/mixertime.zip" download>
+            Scarica MixerTime
+          </a>
+        </div>
+
+        <div class="hero-gallery">
+          <video
+            class="hero-image hero-image-large hero-video"
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            aria-label="Anteprima di Avelis"
+          >
+            <source src="assets/videos/avelis-hero.mp4" type="video/mp4" />
+          </video>
+
+          <div class="hero-image placeholder-box">
+            <span>Immagine 2 — PipeRoute in uso</span>
+          </div>
+
+          <div class="hero-image placeholder-box">
+            <span>Immagine 3 — MixerTime in uso</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="software-section" id="software">
+      <div class="section-head">
+        <h2>Software</h2>
+      </div>
+
+      <div class="software-grid">
+        <article class="software-card">
+          <video
+            class="software-media software-video"
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            aria-label="Anteprima Avelis"
+          >
+            <source src="assets/videos/avelis-card.mp4" type="video/mp4" />
+          </video>
+
+          <div class="software-copy">
+            <p class="software-index">01</p>
+            <h3>Avelis</h3>
+            <p>
+              CRM e workspace per prospect, clienti, trattative e processi.
+            </p>
+
+            <div class="card-actions">
+              <a class="text-link" href="downloads/avelis.zip" download>
+                Scarica gratuitamente
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <article class="software-card">
+          <div class="software-media placeholder-box">
+            <span>Immagine 1 di PipeRoute</span>
+          </div>
+
+          <div class="software-copy">
+            <p class="software-index">02</p>
+            <h3>PipeRoute</h3>
+            <p>
+              Routing audio visivo per controllare flussi, dispositivi e connessioni.
+            </p>
+
+            <div class="card-actions">
+              <a class="text-link" href="downloads/piperoute.zip" download>
+                Scarica gratuitamente
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <article class="software-card">
+          <div class="software-media placeholder-box">
+            <span>Immagine 1 di MixerTime</span>
+          </div>
+
+          <div class="software-copy">
+            <p class="software-index">03</p>
+            <h3>MixerTime</h3>
+            <p>
+              Registrazione e gestione audio con un flusso più diretto e pulito.
+            </p>
+
+            <div class="card-actions">
+              <a class="text-link" href="downloads/mixertime.zip" download>
+                Scarica gratuitamente
+              </a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="contact-section" id="contact">
+      <div class="contact-inner">
+        <h2>Parlaci dei problemi della tua attività.</h2>
+        <p>
+          Se non trovi ancora il software giusto, scrivici cosa ti serve.
+        </p>
+
+        <form id="contactForm" class="contact-form">
+          <div class="form-grid">
+            <input
+              type="text"
+              id="name"
+              name="name"
+              placeholder="Nome"
+              required
+            />
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="Email"
+              required
+            />
+          </div>
+
+          <textarea
+            id="message"
+            name="message"
+            rows="5"
+            placeholder="Raccontaci il problema"
+            required
+          ></textarea>
+
+          <div class="contact-actions">
+            <button class="button button-dark" type="submit">
+              Invia richiesta
+            </button>
+            <p id="formStatus"></p>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
