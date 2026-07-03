@@ -606,3 +606,94 @@ h1 {
   background: #f6f4ef;
   border: 1px solid var(--line);
 }
+
+
+/* Interfaccia multilingua */
+.header-controls {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.header-controls .menu-toggle {
+  justify-self: auto;
+}
+
+.language-picker {
+  display: inline-flex;
+  align-items: center;
+  margin-inline-end: 0.45rem;
+}
+
+.language-picker select {
+  min-height: 34px;
+  padding: 0 0.55rem;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.language-picker select:focus {
+  outline: 1px solid var(--text);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.hero-editorial h1,
+.hero-editorial .hero-subtitle {
+  text-align: start;
+}
+
+html[dir="rtl"] .menu-panel {
+  right: auto;
+  left: 0;
+  border-right: 1px solid var(--line);
+  border-left: 0;
+}
+
+html[dir="rtl"] .hero-software-item {
+  grid-template-columns: 1fr 2.3rem;
+}
+
+html[dir="rtl"] .hero-software-item > span {
+  grid-column: 2;
+  text-align: start;
+}
+
+html[dir="rtl"] .hero-software-item > div {
+  grid-column: 1;
+}
+
+html[dir="rtl"] input[type="email"] {
+  direction: ltr;
+  text-align: left;
+}
+
+@media (max-width: 720px) {
+  .header-controls {
+    gap: 0.55rem;
+  }
+
+  .language-picker select {
+    max-width: 5.8rem;
+    padding: 0 0.35rem;
+    font-size: 0.68rem;
+  }
+}
