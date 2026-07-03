@@ -489,3 +489,14 @@ h1 {
   background: #f6f4ef;
   border: 1px solid var(--line);
 }
+
+
+/* Immagine PipeRoute nella galleria */
+.hero-image-piperoute {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  min-height: 0;
+  display: block;
+  object-fit: cover;
+  background: #f6f4ef;
+}
