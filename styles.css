@@ -479,7 +479,7 @@ h1 {
   display: block;
   object-fit: cover;
   background: #f6f4ef;
-  border: 1px solid var(--line);
+  border: 0px solid var(--line);
 }
 
 .software-video {
