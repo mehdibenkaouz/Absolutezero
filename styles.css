@@ -596,3 +596,13 @@ h1 {
     width: 100%;
   }
 }
+
+
+/* Immagine card Flow */
+.software-image {
+  width: 100%;
+  display: block;
+  object-fit: cover;
+  background: #f6f4ef;
+  border: 1px solid var(--line);
+}
