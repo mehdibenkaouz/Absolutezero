@@ -51,7 +51,8 @@ a {
 
 a:focus-visible,
 summary:focus-visible,
-video:focus-visible {
+video:focus-visible,
+iframe:focus-visible {
     outline: 3px solid var(--gold);
     outline-offset: 5px;
 }
@@ -230,7 +231,7 @@ h3 {
     font-size: .875rem;
 }
 
-/* VIDEO */
+/* VIDEO E MEDIA */
 
 figure {
     margin: 0;
@@ -269,6 +270,23 @@ figure {
     border-top: 1px solid var(--line);
 }
 
+/* YOUTUBE */
+
+.youtube-video {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000;
+}
+
+.youtube-video iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+/* VIDEO LOCALE */
+
 video {
     width: 100%;
     height: auto;
@@ -283,6 +301,12 @@ video {
     color: var(--muted);
     font-size: .875rem;
     margin: .65rem 1rem;
+}
+
+/* VIDEO TECNICO IN FONDO */
+
+.demo-section .product {
+    margin-top: 0;
 }
 
 /* FACTS */
@@ -544,6 +568,10 @@ footer {
         margin-top: 2rem;
     }
 
+    .demo-section .product {
+        margin-top: 0;
+    }
+
     .screen-head {
         flex-wrap: wrap;
     }
@@ -676,49 +704,36 @@ footer {
 
         </div>
 
-        <!-- VIDEO PRINCIPALE -->
+        <!-- VIDEO YOUTUBE PRINCIPALE -->
 
         <figure class="product">
 
             <div class="screen-head">
-                <strong>Flow · Demo</strong>
-                <span>Panoramica dell’applicazione</span>
+                <strong>Flow · Presentazione</strong>
+                <span>Scopri Flow in azione</span>
             </div>
 
-            <video
+            <div
+                class="youtube-video"
                 id="video"
-                controls
-                playsinline
-                preload="metadata"
-                poster="screenshots/01-planning.png"
-                width="1920"
-                height="1080"
-                aria-label="Panoramica dell’applicazione Flow"
             >
 
-                <source
-                    src="../assets/videos/flow-panoramica-1080.mp4"
-                    type="video/mp4"
-                >
+                <iframe
+                    src="https://www.youtube-nocookie.com/embed/e1DCODrfQ9s?rel=0"
+                    title="Flow — Software per la pianificazione dei turni"
+                    loading="lazy"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen
+                ></iframe>
 
-                Il browser non supporta questo video.
-
-                <a href="../assets/videos/flow-panoramica-1080.mp4">
-                    Apri il video di Flow
-                </a>.
-
-            </video>
-
-            <p class="video-caption">
-                <a href="../assets/videos/flow-panoramica-1080.mp4">
-                    Apri il video separatamente
-                </a>
-            </p>
+            </div>
 
             <figcaption>
-                Guarda Flow in funzione prima di scaricarlo.
-                I dati mostrati nel video e negli screenshot sono fittizi
-                e usati a scopo dimostrativo.
+                Scopri Flow in azione: dalla pianificazione dei turni
+                alla gestione del personale e delle regole operative.
+                I dati mostrati sono fittizi e utilizzati esclusivamente
+                a scopo dimostrativo.
             </figcaption>
 
         </figure>
@@ -1112,6 +1127,76 @@ footer {
             </p>
 
         </details>
+
+    </section>
+
+    <!-- SECONDO VIDEO / DEMO TECNICA -->
+
+    <section
+        class="block demo-section"
+        id="demo-completa"
+    >
+
+        <div class="section-head">
+
+            <h2>
+                Vuoi vedere<br>
+                qualcosa in più?
+            </h2>
+
+            <p>
+                Una panoramica più diretta dell’applicazione,
+                per osservare l’interfaccia di Flow
+                e alcune delle sue funzioni più da vicino.
+            </p>
+
+        </div>
+
+        <figure class="product">
+
+            <div class="screen-head">
+                <strong>Flow · Demo dell’applicazione</strong>
+                <span>Panoramica più dettagliata</span>
+            </div>
+
+            <video
+                controls
+                playsinline
+                preload="metadata"
+                poster="screenshots/01-planning.png"
+                width="1920"
+                height="1080"
+                aria-label="Panoramica dettagliata dell’applicazione Flow"
+            >
+
+                <source
+                    src="../assets/videos/flow-panoramica-1080.mp4"
+                    type="video/mp4"
+                >
+
+                Il browser non supporta questo video.
+
+                <a href="../assets/videos/flow-panoramica-1080.mp4">
+                    Apri il video di Flow
+                </a>.
+
+            </video>
+
+            <p class="video-caption">
+
+                <a href="../assets/videos/flow-panoramica-1080.mp4">
+                    Apri il video separatamente
+                </a>
+
+            </p>
+
+            <figcaption>
+                Una panoramica più dettagliata dell’applicazione Flow.
+                Nomi, turni e dati aziendali mostrati sono fittizi
+                e utilizzati esclusivamente a scopo dimostrativo.
+            </figcaption>
+
+        </figure>
 
     </section>
 
