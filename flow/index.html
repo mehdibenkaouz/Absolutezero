@@ -16,6 +16,9 @@
     href="https://www.mehdi-benkaouz.com/Absolutezero/flow/"
 >
 
+<link rel="icon" type="image/png" href="../assets/images/flow.png">
+<link rel="apple-touch-icon" href="../assets/images/flow.png">
+
 <style>
 :root {
     color-scheme: dark;
@@ -51,8 +54,7 @@ a {
 
 a:focus-visible,
 summary:focus-visible,
-video:focus-visible,
-iframe:focus-visible {
+video:focus-visible {
     outline: 3px solid var(--gold);
     outline-offset: 5px;
 }
@@ -268,21 +270,6 @@ figure {
     color: var(--muted);
     font-size: .875rem;
     border-top: 1px solid var(--line);
-}
-
-/* YOUTUBE */
-
-.youtube-video {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    background: #000;
-}
-
-.youtube-video iframe {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border: 0;
 }
 
 /* VIDEO LOCALE */
@@ -704,7 +691,7 @@ footer {
 
         </div>
 
-        <!-- VIDEO YOUTUBE PRINCIPALE -->
+        <!-- VIDEO DI PRESENTAZIONE -->
 
         <figure class="product">
 
@@ -713,21 +700,37 @@ footer {
                 <span>Scopri Flow in azione</span>
             </div>
 
-            <div
-                class="youtube-video"
+            <video
                 id="video"
+                controls
+                playsinline
+                preload="metadata"
+                poster="screenshots/02-dashboard.png"
+                width="1920"
+                height="1080"
+                aria-label="Presentazione di Flow"
             >
 
-                <iframe
-                    src="https://www.youtube-nocookie.com/embed/e1DCODrfQ9s?rel=0"
-                    title="Flow — Software per la pianificazione dei turni"
-                    loading="lazy"
-                    referrerpolicy="strict-origin-when-cross-origin"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowfullscreen
-                ></iframe>
+                <source
+                    src="../assets/videos/flow-presentazione-1080.mp4"
+                    type="video/mp4"
+                >
 
-            </div>
+                Il browser non supporta questo video.
+
+                <a href="../assets/videos/flow-presentazione-1080.mp4">
+                    Apri il video di presentazione
+                </a>.
+
+            </video>
+
+            <p class="video-caption">
+
+                <a href="../assets/videos/flow-presentazione-1080.mp4">
+                    Apri il video separatamente
+                </a>
+
+            </p>
 
             <figcaption>
                 Scopri Flow in azione: dalla pianificazione dei turni
