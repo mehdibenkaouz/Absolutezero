@@ -472,7 +472,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.querySelector("#contactForm");
   const formStatus = document.querySelector("#formStatus");
 
-  const CONTACT_EMAIL = "INSERISCI_LA_TUA_EMAIL";
+  const CONTACT_EMAIL = "mehdibenkaouz00@gmail.com";
   let currentLanguage = "it";
 
   function getValue(source, path) {
