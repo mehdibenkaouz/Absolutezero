@@ -243,7 +243,20 @@ html.no-effects .guarda .pupilla,html.no-effects .guarda .occhio,html.no-effects
   <script>
     window.dataLayer=window.dataLayer||[];
     function gtag(){dataLayer.push(arguments);}
-    window.flowPreview=location.protocol==='file:'||['localhost','127.0.0.1'].includes(location.hostname)||new URLSearchParams(location.search).get('preview')==='1';
+    // Il mio traffico fuori dalle statistiche. Da ogni mio dispositivo apro la
+    // pagina una volta con ?preview=1: la scelta resta scritta nel browser e da
+    // quel momento non parte più niente, né GA4 né la conversione Ads. Con
+    // ?preview=0 si torna a essere contati come chiunque altro.
+    window.flowPreview=(function(){
+      if(location.protocol==='file:'||['localhost','127.0.0.1'].includes(location.hostname))return true;
+      var scelta=new URLSearchParams(location.search).get('preview');
+      try{
+        if(scelta==='1')localStorage.setItem('flowNoStat','1');
+        if(scelta==='0')localStorage.removeItem('flowNoStat');
+        if(localStorage.getItem('flowNoStat')==='1')return true;
+      }catch(e){/* finestra anonima o dati bloccati: vale solo il parametro */}
+      return scelta==='1';
+    })();
     if(!window.flowPreview){
       const tag=document.createElement('script');tag.async=true;tag.src='https://www.googletagmanager.com/gtag/js?id=G-1HQHFSR8M7';document.head.append(tag);
       gtag('js',new Date());gtag('config','G-1HQHFSR8M7');
