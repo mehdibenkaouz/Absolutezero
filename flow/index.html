@@ -260,6 +260,7 @@ html.no-effects .guarda .pupilla,html.no-effects .guarda .occhio,html.no-effects
       }catch(e){/* finestra anonima o dati bloccati: vale solo il parametro */}
       return scelta==='1';
     })();
+    window.flowDebug=new URLSearchParams(location.search).get('ga_debug')==='1';
     if(!window.flowPreview){
       const tag=document.createElement('script');tag.async=true;tag.src='https://www.googletagmanager.com/gtag/js?id=G-1HQHFSR8M7';document.head.append(tag);
       gtag('js',new Date());gtag('config','G-1HQHFSR8M7');
@@ -332,8 +333,8 @@ html.no-effects .guarda .pupilla,html.no-effects .guarda .occhio,html.no-effects
  document.querySelectorAll('[data-va-giu]').forEach(function(l){
    l.addEventListener('click',function(){track('flow_vai_installazione',{placement:l.dataset.vaGiu});});
  });
- function track(name,params={}){if(!window.flowPreview&&typeof gtag==='function')gtag('event',name,{send_to:'G-1HQHFSR8M7',...params});}
- function trackInstallIntent(){if(!window.flowPreview&&typeof gtag==='function')gtag('event','conversion',{send_to:'AW-18445723823/c5dtCOK4vvocEK_RzdtE',value:1.0,currency:'EUR'});}
+ function track(name,params={}){if(!window.flowPreview&&typeof gtag==='function')gtag('event',name,{send_to:'G-1HQHFSR8M7',...(window.flowDebug?{debug_mode:true}:{}),...params});}
+ function trackInstallIntent(){if(!window.flowPreview&&!window.flowDebug&&typeof gtag==='function')gtag('event','conversion',{send_to:'AW-18445723823/c5dtCOK4vvocEK_RzdtE',value:1.0,currency:'EUR'});}
  const video=document.getElementById('flowVideo'),play=document.getElementById('playButton');play.addEventListener('click',async()=>{if(video.paused){try{await video.play();}catch{play.textContent='Riprova ▶';}}else video.pause();});video.addEventListener('play',()=>play.textContent='Pausa Ⅱ');video.addEventListener('pause',()=>play.textContent='Riproduci ▷');video.addEventListener('play',()=>track('flow_video_play',{video_id:'presentazione'}),{once:true});
  const dialog=document.getElementById('handoff'),status=document.getElementById('handoffStatus'),page='https://www.mehdi-benkaouz.com/Absolutezero/flow/';const onPhone=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
  if(onPhone){const nav=document.querySelector('.nav-download');nav.dataset.flowDownload='nav';document.querySelector('.hero-fineprint').textContent='Sei da cellulare? Salva la pagina e provalo dal tuo PC Windows.';}
