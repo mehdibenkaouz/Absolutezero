@@ -8,7 +8,16 @@
   const form = document.getElementById('feedbackForm');
   const message = document.getElementById('feedbackMessage');
   const status = document.getElementById('feedbackStatus');
-  const endpoint = 'https://flow-feedback-service.speedybasil5.chatgpt.site/api/feedback';
+  const config = window.FLOW_FEEDBACK_CONFIG;
+  let endpoint = null;
+  try {
+    const independent = Boolean(config?.apiBase);
+    const base = new URL(independent ? config.apiBase : config?.legacyApiBase);
+    const allowed = independent
+      ? base.hostname.endsWith('.workers.dev') || base.hostname === 'mehdi-benkaouz.com' || base.hostname.endsWith('.mehdi-benkaouz.com')
+      : base.hostname === 'flow-feedback-service.speedybasil5.chatgpt.site';
+    if (allowed && base.protocol === 'https:' && !base.username && !base.password && !base.port && !base.search && !base.hash && base.pathname === '/') endpoint = base.origin + '/api/feedback';
+  } catch { /* Fail closed when the configuration script is unavailable. */ }
   const send = document.getElementById('feedbackSend');
   const success = document.getElementById('feedbackSuccess');
   const note = document.getElementById('feedbackNote');
@@ -141,6 +150,7 @@
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
     try {
+      if (!endpoint) throw new Error('Il servizio non è disponibile. Il testo è ancora qui: riprova tra poco.');
       requestId = requestId || crypto.randomUUID();
       const tokenResponse = await fetch(endpoint + '/challenge', { credentials: 'omit', cache: 'no-store', signal: controller.signal });
       const token = await tokenResponse.json();

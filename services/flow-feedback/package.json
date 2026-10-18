@@ -1,0 +1,32 @@
+{
+  "name": "flow-feedback",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs && node tests/frontend-controller.cjs",
+    "deploy": "wrangler d1 migrations apply DB --remote && wrangler deploy",
+    "dev": "wrangler d1 migrations apply DB --local && wrangler dev",
+    "check": "wrangler deploy --dry-run --outdir dist",
+    "connect": "node scripts/connect.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "4.92.0"
+  },
+  "cloudflare": {
+    "bindings": {
+      "ADMIN_PASSWORD": {
+        "description": "La password privata della tua bacheca. Scegli una password unica di almeno 20 caratteri e salvala nel tuo gestore password. Non inviarla in chat."
+      },
+      "FEEDBACK_SIGNING_KEY": {
+        "description": "Una chiave casuale diversa dalla password, di almeno 32 caratteri. Puoi generarla con il gestore password o con openssl rand -hex 32."
+      },
+      "DB": {
+        "description": "Archivio privato dei pareri ricevuti da Flow. Il database rimane nel tuo account Cloudflare."
+      }
+    }
+  }
+}
