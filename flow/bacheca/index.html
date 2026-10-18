@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self' https://*.workers.dev https://*.mehdi-benkaouz.com https://mehdi-benkaouz.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Flow — Bacheca privata</title><link rel="stylesheet" href="bacheca.css"><script src="../feedback-config.js" defer></script><script src="bacheca.js" defer></script>
+</head>
+<body><div class="board-shell">
+<header class="board-top"><a class="brand" href="../">≋ Flow</a><div class="private-label">Bacheca privata <button id="logout" class="refresh" type="button" hidden>Esci</button></div></header>
+<main><section class="board-intro"><p class="eyebrow">LE IDEE DI CHI PROVA FLOW</p><h1>Una bacheca.<br>Per ascoltare meglio.</h1><p>Qui trovi i pareri e le domande inviati dal sito. I messaggi sono riservati a te.</p></section>
+<p id="notice" class="notice" role="status" aria-live="polite"></p>
+<section id="setup" class="login-card" hidden><h2>Collega il tuo archivio</h2><p>Il codice è pronto su GitHub. Prima attiva il servizio nel tuo account Cloudflare, poi inserisci il suo indirizzo HTTPS.</p><a class="human-link" href="https://deploy.workers.cloudflare.com/?url=https%3A%2F%2Fgithub.com%2Fmehdibenkaouz%2FAbsolutezero%2Ftree%2Fmain%2Fservices%2Fflow-feedback" target="_blank" rel="noopener noreferrer">Attiva il servizio dal repository ↗</a><form id="connect-form"><label for="api-url">Indirizzo del servizio</label><input id="api-url" type="url" placeholder="https://flow-feedback.…workers.dev" required autocomplete="url"><button id="connect-button" class="primary" type="submit">Collega</button></form><p class="small">L’indirizzo non è una password. Dopo il collegamento va salvato anche nella configurazione del sito per spostare qui i nuovi feedback.</p></section>
+<section id="login" class="login-card" hidden><h2>Accedi ai tuoi messaggi</h2><p>Usa la password scelta per questa bacheca. Non serve un account ChatGPT.</p><form id="login-form"><label for="password">Password della bacheca</label><input id="password" type="password" autocomplete="current-password" required maxlength="200"><button id="login-button" class="primary" type="submit">Apri la bacheca</button></form><p class="small">La sessione dura 30 minuti. Premi Esci quando hai finito.</p></section>
+<section id="board" aria-label="Feedback ricevuti" hidden>
+<div class="overview"><div><strong id="new-count">—</strong><span>pareri da leggere</span></div><div><strong id="total-count">—</strong><span>ricevuti in tutto</span></div><div class="overview-note">Una domanda può indicare un punto poco chiaro.<br>Un suggerimento può diventare il prossimo miglioramento.</div></div>
+<div class="board-toolbar"><div class="filters" role="group" aria-label="Filtra i messaggi"><button type="button" data-filter="all" aria-pressed="true">Tutti <span id="count-all">—</span></button><button type="button" data-filter="new" aria-pressed="false">Da leggere <span id="count-new">—</span></button><button type="button" data-filter="read" aria-pressed="false">Letti <span id="count-read">—</span></button><button type="button" data-filter="archived" aria-pressed="false">Archiviati <span id="count-archived">—</span></button></div><button id="refresh" type="button" class="refresh">Aggiorna ↻</button></div>
+<div id="empty" class="empty" hidden><h2>Nessun messaggio in questa sezione.</h2><p>I nuovi pareri compariranno qui. Puoi cambiare filtro o aggiornare la bacheca.</p></div><div id="messages" class="messages" aria-busy="false"></div><button id="more" type="button" class="load-more" hidden>Carica altri messaggi</button><p id="updated" class="updated"></p>
+</section><noscript><p>Per accedere alla bacheca abilita JavaScript.</p></noscript></main>
+<footer class="board-footer">Flow · <a href="../">Torna al sito</a></footer>
+</div></body></html>

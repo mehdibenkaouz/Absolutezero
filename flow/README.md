@@ -18,16 +18,19 @@ Il layout usa fino a 1520 px sui monitor grandi; i paragrafi mantengono una misu
 
 Verificati il 18 ottobre 2026: articolo 50(4)–(5) dell’AI Act (https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-50) e indicazioni della Commissione (https://digital-strategy.ec.europa.eu/en/policies/eu-icons-labelling-ai-generated-content). L’articolo richiede informazione chiara, distinguibile e accessibile alla prima esposizione quando la disclosure è dovuta; non fissa una misura in pixel. La dicitura resta visibile accanto a ogni scena. Questa scelta non costituisce una verifica legale complessiva del sito.
 
-## Invio diretto
+## Feedback e migrazione indipendente
 
-`feedback.js` invia il parere a `https://flow-feedback-service.speedybasil5.chatgpt.site/api/feedback`. Non apre la posta e non richiede nome, email o registrazione. Il successo viene mostrato solo quando il servizio restituisce la conferma del salvataggio. Il testo resta disponibile in caso di errore; una chiave di richiesta evita duplicazioni quando si riprova dopo una risposta persa.
+La bacheca è ora inclusa nel repository, in `flow/bacheca/`. Il servizio autonomo, i test e l’attivazione nel proprio account Cloudflare si trovano in [`services/flow-feedback`](../services/flow-feedback/README.md). La pagina di login è pubblica; il server protegge i messaggi con password e sessioni a scadenza. Il codice e l’archivio operativo, dopo il collegamento, non richiedono ChatGPT.
 
-Il servizio ammette gli origin HTTPS del dominio mehdi-benkaouz.com (con e senza www) e mehdibenkaouz.github.io. Un eventuale nuovo dominio richiede l'aggiornamento dell'allowlist server. Non inserire chiavi amministrative nei file della pagina.
+`feedback.js` legge `feedback-config.js` prima di inviare. Durante il passaggio la configurazione mantiene esplicitamente il precedente ricevitore ChatGPT Sites per evitare interruzioni: il campo `apiBase` vuoto indica che il nuovo Worker non è ancora collegato. Non dichiarare completata la migrazione finché il nuovo archivio non è attivo, i pareri esistenti non sono stati trasferiti e la configurazione aggiornata non è pubblicata. Il comando `npm run connect -- URL` nel servizio verifica il Worker e rimuove la destinazione precedente dalla configurazione.
 
-Il popup usa l'uscita del puntatore verso l'alto dopo 15 secondi di pagina visibile; sui dispositivi touch usa 45 secondi visibili, almeno metà pagina esplorata e un ritorno verso l'alto seguito da una pausa. L'invito automatico compare una volta per sessione e non interrompe video, campi in modifica, altre finestre o la demo a schermo intero. Il link manuale resta disponibile.
+I visitatori scrivono direttamente senza nome, email o registrazione. Una conferma con lo stesso ID della richiesta indica che il messaggio è stato salvato. Gli errori conservano il testo e permettono il nuovo tentativo senza duplicarlo. Il contenuto dei pareri non viene inviato a GA4.
 
-## Bacheca privata
+Il popup automatico mantiene uscita desktop dopo 15 secondi visibili e invito mobile dopo lettura e ritorno verso l’alto; compare una volta per sessione e non interrompe altre finestre, input, video o demo a schermo intero. I link manuali restano disponibili.
 
-https://flow-feedback-bacheca.speedybasil5.chatgpt.site
+### Accessi nel passaggio
 
-La bacheca richiede l'accesso ChatGPT ed è pubblicata con il solo proprietario autorizzato. Permette lettura, filtri, aggiornamento, paginazione e archiviazione. Il servizio ricevente e il database sono gestiti separatamente tramite Sites; i segreti sono configurati solo sul server. Il testo dei pareri non viene inviato a GA4. Gli eventi misurano soltanto apertura, chiusura, invio confermato o errore.
+- Nuova pagina nel proprio sito: https://www.mehdi-benkaouz.com/Absolutezero/flow/bacheca/
+- Vecchia bacheca, da conservare per il recupero dei dati fino al completamento del passaggio: https://flow-feedback-bacheca.speedybasil5.chatgpt.site
+
+Le password si impostano solo nei segreti Cloudflare. Non mettere nel repository credenziali o feedback reali.
