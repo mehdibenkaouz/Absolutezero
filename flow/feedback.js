@@ -1,5 +1,5 @@
-/* Feedback goes through the visitor's email account, not an unconfigured API.
-   Never send the message (or an email address) to analytics. */
+/* Send directly to the feedback service. Only confirmed database receipts
+   show success. Never send message text or contact details to analytics. */
 (() => {
   'use strict';
   const dialog = document.getElementById('flowFeedback');
@@ -8,9 +8,12 @@
   const form = document.getElementById('feedbackForm');
   const message = document.getElementById('feedbackMessage');
   const status = document.getElementById('feedbackStatus');
-  const recipient = 'mehdi@mehdi-benkaouz.com';
-  const subject = 'Un parere su Flow';
-  const sessionKey = 'flow.feedback.prompted.v1';
+  const endpoint = 'https://flow-feedback-service.speedybasil5.chatgpt.site/api/feedback';
+  const send = document.getElementById('feedbackSend');
+  const success = document.getElementById('feedbackSuccess');
+  const note = document.getElementById('feedbackNote');
+  let sending = false, sent = false, requestId = null;
+  const sessionKey = 'flow.feedback.prompted.v2';
   const touch = matchMedia('(hover: none), (pointer: coarse)');
   let prompted = false;
   let source = 'manual';
@@ -30,7 +33,7 @@
   }
 
   function track(name, extra = {}) {
-    // Track attempts, never claim that an email was actually sent.
+    // Track interactions without message content or identifying fields.
     if (typeof window.flowTrack === 'function') window.flowTrack(name, { source, ...extra });
   }
 
@@ -59,7 +62,10 @@
     if (dialog.open || (trigger !== 'manual' && (prompted || busy()))) return;
     previousFocus = document.activeElement;
     source = trigger;
-    status.textContent = '';
+    if (trigger === 'manual' && sent) {
+      form.reset(); sent = false; requestId = null; success.hidden = true; form.hidden = false; note.hidden = false;
+    }
+    if (!sending) status.textContent = '';
     dialog.showModal();
     document.body.classList.add('feedback-open');
     markPrompted();
@@ -79,6 +85,7 @@
   });
 
   document.getElementById('feedbackClose').addEventListener('click', () => dialog.close());
+  document.getElementById('feedbackDone').addEventListener('click', () => dialog.close());
   dialog.addEventListener('click', event => {
     if (event.target !== dialog) return;
     const rect = dialog.getBoundingClientRect();
@@ -120,42 +127,40 @@
     if (action && !action.matches('[data-flow-feedback]') && !dialog.contains(action)) markPrompted();
   }, { capture: true });
 
-  function body() {
-    return message.value.trim() + '\n\n—\nParere sulla pagina Flow\nhttps://www.mehdi-benkaouz.com/Absolutezero/flow/';
-  }
-
   function valid() {
     message.setCustomValidity(message.value.trim() ? '' : 'Scrivi il tuo parere, basta anche una frase.');
     return form.reportValidity();
   }
-  message.addEventListener('input', () => message.setCustomValidity(''));
+  message.addEventListener('input', () => { message.setCustomValidity(''); if (!sending) requestId = null; });
 
-  form.addEventListener('submit', event => {
+  form.addEventListener('submit', async event => {
     event.preventDefault();
-    if (!valid()) return;
-    const method = event.submitter && event.submitter.value === 'gmail' ? 'gmail' : 'email';
-    if (method === 'gmail') {
-      const url = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(recipient) +
-        '&su=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body());
-      window.open(url, '_blank', 'noopener,noreferrer');
-      status.textContent = 'Invia la bozza da Gmail. Se non si apre una nuova scheda, usa “Prepara l’email” oppure “Copia il messaggio”.';
-    } else {
-      location.href = 'mailto:' + recipient + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body());
-      status.textContent = 'Invia la bozza dalla tua app di posta. Se non si apre, usa Gmail oppure copia il messaggio.';
-    }
-    track('flow_feedback_email_draft', { method });
-  });
-
-  document.getElementById('feedbackCopy').addEventListener('click', async () => {
-    if (!valid()) return;
+    if (sending || sent || !valid()) return;
+    sending = true; send.disabled = true; message.readOnly = true;
+    send.textContent = 'Invio in corso…'; status.textContent = '';
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
     try {
-      await navigator.clipboard.writeText('A: ' + recipient + '\nOggetto: ' + subject + '\n\n' + body());
-      status.textContent = 'Messaggio copiato. Incollalo nella tua posta e invialo a ' + recipient + '.';
-      track('flow_feedback_copy');
-    } catch (_) {
-      message.focus();
-      message.select();
-      status.textContent = 'Copia il testo selezionato e invialo a ' + recipient + '.';
+      requestId = requestId || crypto.randomUUID();
+      const tokenResponse = await fetch(endpoint + '/challenge', { credentials: 'omit', cache: 'no-store', signal: controller.signal });
+      const token = await tokenResponse.json();
+      if (!tokenResponse.ok || typeof token.challenge !== 'string') throw new Error('Il servizio non è disponibile. Il testo è ancora qui: riprova tra poco.');
+      const response = await fetch(endpoint, {
+        method: 'POST', credentials: 'omit', cache: 'no-store', signal: controller.signal,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: message.value.trim(), category: 'generale', requestId, challenge: token.challenge, website: document.getElementById('feedbackWebsite').value })
+      });
+      const receipt = await response.json();
+      if (!response.ok || receipt.ok !== true || receipt.id !== requestId) throw new Error(receipt.error || 'Non ho potuto confermare l’invio. Il testo è ancora qui: riprova.');
+      sent = true; form.hidden = true; note.hidden = true; success.hidden = false;
+      status.textContent = ''; success.focus({ preventScroll: true });
+      track('flow_feedback_submit');
+    } catch (error) {
+      status.textContent = error.name === 'AbortError' ? 'La connessione è lenta e non ho potuto confermare l’invio. Il testo è ancora qui: riprova.' : (error.message || 'Non ho potuto confermare l’invio. Il testo è ancora qui: riprova.');
+      track('flow_feedback_error');
+    } finally {
+      clearTimeout(timeout); sending = false; send.disabled = false; message.readOnly = false;
+      send.textContent = 'Invia il tuo parere ↗';
     }
   });
 })();
