@@ -1,5 +1,4 @@
-/* Temporary transition: connect.mjs replaces this with the independent API. */
+/* Independent feedback service, owned and hosted outside ChatGPT. */
 window.FLOW_FEEDBACK_CONFIG = Object.freeze({
-  apiBase: '',
-  legacyApiBase: 'https://flow-feedback-service.speedybasil5.chatgpt.site'
+  "apiBase": "https://flow-feedback.convergegame.workers.dev"
 });
