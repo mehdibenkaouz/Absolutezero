@@ -9,11 +9,16 @@ async function sign(secret, text) {
   return base64url(new Uint8Array(await crypto.subtle.sign('HMAC', key, encoder.encode(text))));
 }
 function same(a, b) { if (a.length !== b.length) return false; let diff = 0; for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i); return diff === 0; }
-function configured(env) {
-  return env.DB && typeof env.ADMIN_PASSWORD === 'string' && env.ADMIN_PASSWORD.length >= 20 && env.ADMIN_PASSWORD.length <= 200 &&
-    typeof env.FEEDBACK_SIGNING_KEY === 'string' && env.FEEDBACK_SIGNING_KEY.length >= 32 && env.ADMIN_PASSWORD !== env.FEEDBACK_SIGNING_KEY &&
-    !/CHANGE_ME|INSERISCI|replace-me/i.test(env.ADMIN_PASSWORD + env.FEEDBACK_SIGNING_KEY);
+function configurationChecks(env) {
+  return {
+    databaseBinding: Boolean(env.DB),
+    adminPasswordValid: typeof env.ADMIN_PASSWORD === 'string' && env.ADMIN_PASSWORD.length >= 20 && env.ADMIN_PASSWORD.length <= 200,
+    signingKeyValid: typeof env.FEEDBACK_SIGNING_KEY === 'string' && env.FEEDBACK_SIGNING_KEY.length >= 32,
+    secretsDistinct: typeof env.ADMIN_PASSWORD === 'string' && typeof env.FEEDBACK_SIGNING_KEY === 'string' && env.ADMIN_PASSWORD !== env.FEEDBACK_SIGNING_KEY,
+    noPlaceholders: !/CHANGE_ME|INSERISCI|replace-me/i.test(String(env.ADMIN_PASSWORD || '') + String(env.FEEDBACK_SIGNING_KEY || '')),
+  };
 }
+function configured(env) { return Object.values(configurationChecks(env)).every(Boolean); }
 function response(data, status = 200) { return new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json; charset=utf-8' } }); }
 function secure(result, origin) {
   const headers = new Headers(result.headers);
@@ -64,12 +69,16 @@ export async function handleRequest(request, env, now = Date.now()) {
   let result;
   try {
     if (url.pathname === '/health' && request.method === 'GET') {
-      let ready = false;
-      if (configured(env)) {
-        const result = await env.DB.prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE type = 'table' AND name IN ('feedback', 'feedback_rate_limits', 'feedback_admin_sessions')").first();
-        ready = result?.n === 3;
+      // Expose only pass/fail flags, never secret values, lengths or database errors.
+      const checks = { ...configurationChecks(env), databaseTables: false };
+      if (checks.databaseBinding) {
+        try {
+          const result = await env.DB.prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE type = 'table' AND name IN ('feedback', 'feedback_rate_limits', 'feedback_admin_sessions')").first();
+          checks.databaseTables = result?.n === 3;
+        } catch { /* A failed database check must not disclose the underlying error. */ }
       }
-      return secure(response({ service: 'flow-feedback', version: 1, ready, auth: 'password' }, ready ? 200 : 503), origin);
+      const ready = Object.values(checks).every(Boolean);
+      return secure(response({ service: 'flow-feedback', version: 1, ready, auth: 'password', checks }, ready ? 200 : 503), origin);
     }
     if (!allowedOrigin(origin)) return secure(response({ error: 'Origine non autorizzata.' }, 403), null);
     if (request.method === 'OPTIONS') {
@@ -96,4 +105,5 @@ export async function handleRequest(request, env, now = Date.now()) {
   }
   return secure(result, origin);
 }
-export default { fetch: handleRequest };
+// Cloudflare passes ExecutionContext as the third fetch argument, not a timestamp.
+export default { fetch(request, env) { return handleRequest(request, env); } };
