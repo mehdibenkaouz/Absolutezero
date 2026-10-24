@@ -30,14 +30,11 @@
   let visibleTime = 0;
   let visibleSince = document.hidden ? null : performance.now();
   let lastScroll = scrollY;
-  let deepestScroll = scrollY;
-  let readingTimer;
 
   try { prompted = sessionStorage.getItem(sessionKey) === '1'; } catch (_) { /* in-memory limit still works */ }
 
   function markPrompted() {
     prompted = true;
-    clearTimeout(readingTimer);
     try { sessionStorage.setItem(sessionKey, '1'); } catch (_) { /* storage may be unavailable */ }
   }
 
@@ -54,7 +51,6 @@
     if (document.hidden) {
       if (visibleSince !== null) visibleTime += performance.now() - visibleSince;
       visibleSince = null;
-      clearTimeout(readingTimer);
     } else visibleSince = performance.now();
   });
 
@@ -115,18 +111,14 @@
     open('exit_intent');
   });
 
-  // Phones have no exit pointer. Offer feedback after 45 visible seconds,
-  // half the page explored, and a clear upward scroll, once scrolling stops.
+  // Ask immediately on the first upward scroll, on desktop and mobile.
+  // Clamp overscroll so the elastic bounce at a page edge is not an exit signal.
   addEventListener('scroll', () => {
-    const y = scrollY;
-    if (y > lastScroll) deepestScroll = y;
-    const upward = deepestScroll - y;
+    const available = Math.max(0, document.documentElement.scrollHeight - innerHeight);
+    const y = Math.max(0, Math.min(scrollY, available));
+    const upward = y < lastScroll;
     lastScroll = y;
-    clearTimeout(readingTimer);
-    const available = document.documentElement.scrollHeight - innerHeight;
-    if (!touch.matches || prompted || available <= 0 || deepestScroll / available < 0.5 ||
-        upward < 120 || timeOnPage() < 45000) return;
-    readingTimer = setTimeout(() => open('mobile_reading'), 1200);
+    if (upward) open('scroll_up');
   }, { passive: true });
 
   // A visitor choosing installation or contact is already taking action.
