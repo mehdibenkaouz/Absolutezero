@@ -8,6 +8,7 @@
   const form = document.getElementById('feedbackForm');
   const message = document.getElementById('feedbackMessage');
   const status = document.getElementById('feedbackStatus');
+  const copy = window.FLOW_FEEDBACK_COPY || {};
   const config = window.FLOW_FEEDBACK_CONFIG;
   let endpoint = null;
   try {
@@ -129,7 +130,7 @@
   }, { capture: true });
 
   function valid() {
-    message.setCustomValidity(message.value.trim() ? '' : 'Scrivi il tuo parere, basta anche una frase.');
+    message.setCustomValidity(message.value.trim() ? '' : (copy.required || 'Scrivi il tuo parere, basta anche una frase.'));
     return form.reportValidity();
   }
   message.addEventListener('input', () => { message.setCustomValidity(''); if (!sending) requestId = null; });
@@ -138,31 +139,31 @@
     event.preventDefault();
     if (sending || sent || !valid()) return;
     sending = true; send.disabled = true; message.readOnly = true;
-    send.textContent = 'Invio in corso…'; status.textContent = '';
+    send.textContent = (copy.sending || 'Invio in corso…'); status.textContent = '';
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
     try {
-      if (!endpoint) throw new Error('Il servizio non è disponibile. Il testo è ancora qui: riprova tra poco.');
+      if (!endpoint) throw new Error((copy.unavailable || 'Il servizio non è disponibile. Il testo è ancora qui: riprova tra poco.'));
       requestId = requestId || crypto.randomUUID();
       const tokenResponse = await fetch(endpoint + '/challenge', { credentials: 'omit', cache: 'no-store', signal: controller.signal });
       const token = await tokenResponse.json();
-      if (!tokenResponse.ok || typeof token.challenge !== 'string') throw new Error('Il servizio non è disponibile. Il testo è ancora qui: riprova tra poco.');
+      if (!tokenResponse.ok || typeof token.challenge !== 'string') throw new Error((copy.unavailable || 'Il servizio non è disponibile. Il testo è ancora qui: riprova tra poco.'));
       const response = await fetch(endpoint, {
         method: 'POST', credentials: 'omit', cache: 'no-store', signal: controller.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: message.value.trim(), category: 'generale', requestId, challenge: token.challenge, website: document.getElementById('feedbackWebsite').value })
       });
       const receipt = await response.json();
-      if (!response.ok || receipt.ok !== true || receipt.id !== requestId) throw new Error(receipt.error || 'Non ho potuto confermare l’invio. Il testo è ancora qui: riprova.');
+      if (!response.ok || receipt.ok !== true || receipt.id !== requestId) throw new Error(response.status === 429 ? (copy.rateLimit || 'Riprova tra 15 minuti.') : (copy.error || 'Non ho potuto confermare l’invio. Il testo è ancora qui: riprova.'));
       sent = true; form.hidden = true; note.hidden = true; success.hidden = false;
       status.textContent = ''; success.focus({ preventScroll: true });
       track('flow_feedback_submit');
     } catch (error) {
-      status.textContent = error.name === 'AbortError' ? 'La connessione è lenta e non ho potuto confermare l’invio. Il testo è ancora qui: riprova.' : (error.message || 'Non ho potuto confermare l’invio. Il testo è ancora qui: riprova.');
+      status.textContent = error.name === 'AbortError' ? (copy.timeout || 'La connessione è lenta e non ho potuto confermare l’invio. Il testo è ancora qui: riprova.') : (error.message || copy.error || 'Non ho potuto confermare l’invio. Il testo è ancora qui: riprova.');
       track('flow_feedback_error');
     } finally {
       clearTimeout(timeout); sending = false; send.disabled = false; message.readOnly = false;
-      send.textContent = 'Invia il tuo parere ↗';
+      send.textContent = (copy.send || 'Invia il tuo parere ↗');
     }
   });
 })();

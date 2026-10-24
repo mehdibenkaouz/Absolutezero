@@ -36,3 +36,14 @@ body.feedback-open{overflow:hidden}
 #flowFeedback .feedback-success p{font-size:15px;margin-bottom:22px}
 #flowFeedback .feedback-success[hidden],#flowFeedback form[hidden],#flowFeedback p[hidden]{display:none}
 #flowFeedback button:disabled{opacity:.7;cursor:wait}
+
+/* Keep the question readable throughout a slow, gentle pulse. */
+.site-header [data-flow-feedback]{color:var(--gold);animation:feedback-question-pulse 2.4s ease-in-out infinite}
+.site-header [data-flow-feedback]:hover,.site-header [data-flow-feedback]:focus-visible{animation:none;opacity:1}
+@keyframes feedback-question-pulse{0%,100%{opacity:1}50%{opacity:.6}}
+@media(prefers-reduced-motion:reduce){.site-header [data-flow-feedback]{animation:none}}
+#flowFeedback[dir="rtl"]{text-align:right}
+#flowFeedback[dir="rtl"] .feedback-kicker{margin:0 0 14px 32px}
+#flowFeedback[dir="rtl"] h2{padding-right:0;padding-left:18px}
+
+#flowFeedback[dir="rtl"] .dialog-close{right:auto;left:8px}
