@@ -47,3 +47,9 @@ body.feedback-open{overflow:hidden}
 #flowFeedback[dir="rtl"] h2{padding-right:0;padding-left:18px}
 
 #flowFeedback[dir="rtl"] .dialog-close{right:auto;left:8px}
+
+#flowFeedback .feedback-reasons{border:0;padding:0;margin:20px 0;display:grid;gap:10px;min-inline-size:0}
+#flowFeedback .feedback-reasons label{display:flex;align-items:center;gap:12px;margin:0;padding:12px 14px;border:1px solid var(--line-solida);border-radius:10px;cursor:pointer;min-height:48px}
+#flowFeedback .feedback-reasons label:has(input:checked){border-color:var(--gold);background:var(--bg)}
+#flowFeedback .feedback-reasons span{color:var(--paper);font-size:15px;font-weight:500}
+#flowFeedback .feedback-reasons input{width:20px;height:20px;flex-shrink:0;accent-color:var(--gold)}

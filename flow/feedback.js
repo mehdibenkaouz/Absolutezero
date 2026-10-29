@@ -22,6 +22,8 @@
   const send = document.getElementById('feedbackSend');
   const success = document.getElementById('feedbackSuccess');
   const note = document.getElementById('feedbackNote');
+  const experiment = window.FLOW_FEEDBACK_EXPERIMENT;
+  let impressionFrame = 0, impressionSent = false, started = false;
   let sending = false, sent = false, requestId = null;
   const sessionKey = 'flow.feedback.prompted.v2';
   const touch = matchMedia('(hover: none), (pointer: coarse)');
@@ -41,7 +43,36 @@
 
   function track(name, extra = {}) {
     // Track interactions without message content or identifying fields.
-    if (typeof window.flowTrack === 'function') window.flowTrack(name, { source, ...extra });
+    if (typeof window.flowTrack === 'function') window.flowTrack(name, { source, ...(experiment ? {experiment_id: experiment.id, variant: experiment.variant, language: experiment.lang} : {}), ...extra });
+  }
+
+  function visiblePopup() {
+    const rect = dialog.getBoundingClientRect();
+    return dialog.open && !document.hidden && rect.width > 0 && rect.height > 0 &&
+      rect.bottom > 0 && rect.right > 0 && rect.top < innerHeight && rect.left < innerWidth;
+  }
+  function observeImpression() {
+    cancelAnimationFrame(impressionFrame);
+    if (impressionSent || !visiblePopup()) return;
+    // Two frames allow the browser to render the modal before recording exposure.
+    impressionFrame = requestAnimationFrame(() => {
+      impressionFrame = requestAnimationFrame(() => {
+        if (impressionSent || !visiblePopup()) return;
+        impressionSent = true;
+        track('flow_feedback_impression', {visibility_rule: 'painted_visible_v1'});
+      });
+    });
+  }
+  function startAnswer() {
+    if (!started) { started = true; track('flow_feedback_start'); }
+  }
+  function feedbackText() {
+    const text = message.value.trim();
+    if (!experiment) return text;
+    const answer = experiment.answer();
+    if (!text && !answer) return '';
+    return '[Test ' + experiment.id + ' | ' + experiment.variant + ' | ' + experiment.lang +
+      ']\n' + (answer ? 'Risposta: ' + answer + '\n' : '') + text;
   }
 
   function timeOnPage() {
@@ -49,6 +80,8 @@
   }
 
   document.addEventListener('visibilitychange', () => {
+    cancelAnimationFrame(impressionFrame);
+    if (!document.hidden) observeImpression();
     if (document.hidden) {
       if (visibleSince !== null) visibleTime += performance.now() - visibleSince;
       visibleSince = null;
@@ -72,7 +105,9 @@
       form.reset(); sent = false; requestId = null; success.hidden = true; form.hidden = false; note.hidden = false;
     }
     if (!sending) status.textContent = '';
+    impressionSent = false; started = false;
     dialog.showModal();
+    observeImpression();
     document.body.classList.add('feedback-open');
     markPrompted();
     track('flow_feedback_open');
@@ -99,6 +134,7 @@
   });
   // Escape is handled by the native dialog, including its focus trap.
   dialog.addEventListener('close', () => {
+    cancelAnimationFrame(impressionFrame);
     document.body.classList.remove('feedback-open');
     track('flow_feedback_close');
     if (previousFocus && previousFocus.isConnected && previousFocus !== document.body) previousFocus.focus({ preventScroll: true });
@@ -130,14 +166,21 @@
   }, { capture: true });
 
   function valid() {
-    message.setCustomValidity(message.value.trim() ? '' : (copy.required || 'Scrivi il tuo parere, basta anche una frase.'));
+    message.setCustomValidity(feedbackText() ? '' : (copy.required || 'Scrivi il tuo parere, basta anche una frase.'));
     return form.reportValidity();
   }
-  message.addEventListener('input', () => { message.setCustomValidity(''); if (!sending) requestId = null; });
+  message.addEventListener('input', () => { startAnswer(); message.setCustomValidity(''); if (!sending) requestId = null; });
+
+  form.addEventListener('change', event => {
+    if (event.target.name !== 'feedbackReason') return;
+    startAnswer(); message.setCustomValidity(''); requestId = null;
+    track('flow_feedback_choice', {reason: experiment?.reason() || ''});
+  });
 
   form.addEventListener('submit', async event => {
     event.preventDefault();
     if (sending || sent || !valid()) return;
+    form.querySelectorAll('input[name=feedbackReason]').forEach(input => { input.disabled = true; });
     sending = true; send.disabled = true; message.readOnly = true;
     send.textContent = (copy.sending || 'Invio in corso…'); status.textContent = '';
     const controller = new AbortController();
@@ -151,17 +194,18 @@
       const response = await fetch(endpoint, {
         method: 'POST', credentials: 'omit', cache: 'no-store', signal: controller.signal,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: message.value.trim(), category: 'generale', requestId, challenge: token.challenge, website: document.getElementById('feedbackWebsite').value })
+        body: JSON.stringify({ message: feedbackText(), category: 'generale', requestId, challenge: token.challenge, website: document.getElementById('feedbackWebsite').value })
       });
       const receipt = await response.json();
       if (!response.ok || receipt.ok !== true || receipt.id !== requestId) throw new Error(response.status === 429 ? (copy.rateLimit || 'Riprova tra 15 minuti.') : (copy.error || 'Non ho potuto confermare l’invio. Il testo è ancora qui: riprova.'));
       sent = true; form.hidden = true; note.hidden = true; success.hidden = false;
       status.textContent = ''; success.focus({ preventScroll: true });
-      track('flow_feedback_submit');
+      track('flow_feedback_submit', {reason: experiment?.reason() || 'text_only'});
     } catch (error) {
       status.textContent = error.name === 'AbortError' ? (copy.timeout || 'La connessione è lenta e non ho potuto confermare l’invio. Il testo è ancora qui: riprova.') : (error.message || copy.error || 'Non ho potuto confermare l’invio. Il testo è ancora qui: riprova.');
       track('flow_feedback_error');
     } finally {
+      form.querySelectorAll('input[name=feedbackReason]').forEach(input => { input.disabled = false; });
       clearTimeout(timeout); sending = false; send.disabled = false; message.readOnly = false;
       send.textContent = (copy.send || 'Invia il tuo parere ↗');
     }
